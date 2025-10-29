@@ -1,7 +1,7 @@
 ﻿Public Class frmOLTC
     Private WithEvents objAccessXWRM10A As New clsAccessXWRM10A
     Dim objResponse As New Response
-    Dim VarTapNO As Integer
+    Dim VarTapNO As Integer = objResponse.TapNumber
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         TextBox1.Text = objResponse.CURRENT & " " & objResponse.CURRENT_UNIT
         TextBox2.Text = objResponse.READING & " " & objResponse.READING_UNIT
@@ -22,11 +22,13 @@
         Dim rowIndex As Integer = dgvHRdata.Rows.Add()
         With dgvHRdata.Rows(rowIndex)
             .Cells("colTap").Value = objResponse.TapNumber
-            'If objResponse.TapNumber Then
-            .Cells("colUN").Value = objResponse.READING
+            If objResponse.TapNumber > VarTapNO Then
+                .Cells("colUN").Value = objResponse.READING
+                Exit Sub
+            End If
             .Cells("colvn").Value = objResponse.READING
             .Cells("colwn").Value = objResponse.READING
-            '.Cells("colTemp2").Value = objResponse.T2ReadingWithUnit
+
         End With
 
 

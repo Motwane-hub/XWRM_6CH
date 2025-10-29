@@ -446,6 +446,8 @@ Public Class clsAccessXWRM10A : Implements IDisposable
                     strCommand = strCommand & "#07"
                 Case enmLVCurrent.TWENTYFINE_A
                     strCommand = strCommand & "#00"
+                Case Else
+                    strCommand = strCommand & "#08"
             End Select
 
 
@@ -1864,7 +1866,7 @@ Public Class clsAccessXWRM10A : Implements IDisposable
                                     _ResponseResult.Winding = enmWinding.WN
                             End Select
 
-                            _ResponseResult.TapNumber = btData(20) 'tap Numbers
+                            _ResponseResult.TapPos = btData(20) 'tap Numbers
 
                         Case 211 'HR Response
 
@@ -3667,5 +3669,5 @@ Public Class Response
     Public CURRENT_UNIT As Integer
     Public READING As Double
     Public READING_UNIT As Integer
-
+    Public TapPos As Integer
 End Class

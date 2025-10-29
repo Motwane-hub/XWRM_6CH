@@ -9,6 +9,9 @@ Public Class Form1
     Public strComPort As String
 
     Dim objResponse As Response
+    'Dim VarTapNO As Integer = objResponse.TapNumber
+    Private currentReadingIndex As Integer = 0
+    Private totalTaps As Integer = 0
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'RoundFormCorners(Me, 100) ' 25 = corner radius
@@ -16,6 +19,9 @@ Public Class Form1
         'Panel1.BorderStyle = BorderStyle.None
         'RoundPanelCorners(Panel1, 40)  ' 20 = corner radius
         loadcom()
+        Label49.Text = Now.Date
+
+        Label44.Text = DateAndTime.Now.ToString("T")
     End Sub
 
     Private Sub loadcom()
@@ -88,6 +94,7 @@ Public Class Form1
                 MsgBox("Instrument Connected Sucessfully.", MsgBoxStyle.Information)
                 Application.DoEvents()
             Else
+
                 objAccessXWRM10A.Disconnect()
                 'lblStatus.ForeColor = Color.Red
 
@@ -242,6 +249,7 @@ Public Class Form1
                 Label27.Visible = False
                 txtTemp2Loc.Visible = False
                 Label25.Visible = False
+                Panel1.Visible = True
                 'Dim f As New frmOLTC
                 'f.Show()
         End Select
@@ -769,10 +777,10 @@ Public Class Form1
         objAccessXWRM10A.TesON()
         tmrTestON.Start()
 
-        If cmbTestMode.SelectedIndex = 2 Then
-            Dim f As New frmOLTC
-            f.ShowDialog()
-        End If
+        'If cmbTestMode.SelectedIndex = 2 Then
+        '    Dim f As New frmOLTC
+        '    f.ShowDialog()
+        'End If
         'dgvHRdata.AllowUserToAddRows = False
         'dgvHRdata.RowHeadersVisible = False
         'dgvHRdata.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
@@ -786,6 +794,16 @@ Public Class Form1
         'Dim f As New frmTestForm
         'f.ShowDialog()
         'Me.Close()
+
+        'dgvOLTC.AllowUserToAddRows = False
+        'dgvOLTC.RowHeadersVisible = False
+        'dgvOLTC.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+
+        'dgvOLTC.Columns.Add("colTap", "Tap No")
+        'dgvOLTC.Columns.Add("colUN", "UN")
+        'dgvOLTC.Columns.Add("colvn", "VN")
+        'dgvOLTC.Columns.Add("colwn", "WN")
+
 
     End Sub
 
@@ -1078,18 +1096,282 @@ Public Class Form1
     Private Sub Button6_Click(sender As Object, e As EventArgs)
 
     End Sub
+    Private Sub InitializeOLTCGrid(tapCount As Integer)
+        totalTaps = tapCount
+        currentReadingIndex = 0
+
+        With dgvOLTC
+            .AllowUserToAddRows = False
+            .RowHeadersVisible = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .Columns.Clear()
+            .Rows.Clear()
+
+            .Columns.Add("colTap", "Tap No")
+            .Columns.Add("colUN", "UN")
+            .Columns.Add("colVN", "VN")
+            .Columns.Add("colWN", "WN")
+
+            ' Create rows based on total taps
+            For i As Integer = 1 To totalTaps
+                .Rows.Add(i, "", "", "")
+            Next
+        End With
+    End Sub
+    Dim readingValue As Double
+    Dim totalTap As Integer
+    Dim varcolUN As Boolean
+    Dim varcolVN As Boolean
+    Dim varcolWN As Boolean
 
     Private Sub tnrTestON_Tick(sender As Object, e As EventArgs) Handles tmrTestON.Tick
+        Label49.Text = Now.Date
 
+        Label44.Text = DateAndTime.Now.ToString("t")
+        totalTap = CInt(txtTotalTap.Text)
         objResponse = objAccessXWRM10A.GetResponse
 
         lblHVCurrent.Text = objResponse.HVTestCurrent
         lblLVCurrent.Text = objResponse.LVTestCurrent
 
-        TextBox1.Text = objResponse.CURRENT & " " & objResponse.CURRENT_UNIT
-        TextBox2.Text = objResponse.READING & " " & objResponse.READING_UNIT
-        TextBox3.Text = objResponse.T1Reading
+        'NEW CHANGES
 
+        Label31.Text = objResponse.CURRENT
+        TextBox4.Text = objResponse.TapPos
+        '''''''''''
+        ' === Ensure columns exist (run once, e.g. in Form_Load) ===
+        With dgvOLTC
+            .AllowUserToAddRows = False
+            .RowHeadersVisible = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            If .Columns.Count = 0 Then
+                .Columns.Add("colTap", "Tap No")
+                .Columns.Add("colUN", "UN")
+                .Columns.Add("colvn", "VN")
+                .Columns.Add("colwn", "WN")
+            End If
+        End With
+
+        ' === Add or update row ===
+        Dim existingRow As DataGridViewRow = Nothing
+
+        For Each row As DataGridViewRow In dgvOLTC.Rows
+            If Not row.IsNewRow AndAlso row.Cells("colTap").Value IsNot Nothing AndAlso
+       CInt(row.Cells("colTap").Value) = objResponse.TapPos Then
+                existingRow = row
+                Exit For
+            End If
+        Next
+
+        ''If existingRow IsNot Nothing Then
+
+        ''    If existingRow.Index <= totalTap Then
+
+        ''        existingRow.Cells("colUN").Value = objResponse.READING
+        ''    End If
+
+        ''    If existingRow.Index <= totalTap * 2 Then
+
+        ''        existingRow.Cells("colvn").Value = objResponse.READING
+        ''    End If
+        ''    If existingRow.Index <= totalTap * 3 Then
+
+        ''        existingRow.Cells("colwn").Value = objResponse.READING
+        ''    End If
+        ''Else
+        ''    ' ✅ Add new row for new tap number
+        ''    Dim rowIndex As Integer = dgvOLTC.Rows.Add()
+        ''    With dgvOLTC.Rows(rowIndex)
+        ''        .Cells("colTap").Value = objResponse.TapNumber
+        ''        If rowIndex <= totalTap Then
+
+        ''            .Cells("colUN").Value = objResponse.READING
+        ''        End If
+        ''        If rowIndex <= totalTap Then
+
+        ''            .Cells("colvn").Value = objResponse.READING
+        ''        End If
+        ''        If rowIndex <= totalTap Then
+
+        ''            .Cells("colwn").Value = objResponse.READING
+        ''        End If
+        ''    End With
+        ''End If
+
+        'If existingRow IsNot Nothing Then
+
+        '    If existingRow.Index <= objResponse.TapPos Then
+
+        '        existingRow.Cells("colUN").Value = objResponse.READING
+        '    ElseIf txtTotalTap.Text = objResponse.TapPos Then
+
+        '        existingRow.Cells("colvn").Value = objResponse.READING
+        '    ElseIf existingRow.Index <= objResponse.TapPos * 3 Then
+
+        '        existingRow.Cells("colwn").Value = objResponse.READING
+        '    End If
+        'Else
+
+        '    Dim rowIndex As Integer = dgvOLTC.Rows.Add()
+        '    With dgvOLTC.Rows(rowIndex)
+        '        .Cells("colTap").Value = objResponse.TapPos
+        '        If rowIndex <= totalTap Then
+
+        '            .Cells("colUN").Value = objResponse.READING
+        '        ElseIf txtTotalTap.Text >= objResponse.TapPos Then
+
+        '            .Cells("colvn").Value = objResponse.READING
+        '        ElseIf txtTotalTap.Text <= objResponse.TapPos Then
+
+        '            .Cells("colwn").Value = objResponse.READING
+        '        End If
+        '    End With
+        'End If
+
+
+        If existingRow IsNot Nothing Then
+
+            If varcolUN = False Then
+
+                existingRow.Cells("colUN").Value = objResponse.READING
+                If objResponse.TapPos = txtTotalTap.Text Then
+                    varcolUN = True
+                End If
+            End If
+            If varcolUN = True Then
+
+                existingRow.Cells("colvn").Value = objResponse.READING
+                If objResponse.TapPos = 1 Then
+                    varcolVN = True
+                End If
+            End If
+            If varcolVN = True Then
+
+                existingRow.Cells("colwn").Value = objResponse.READING
+
+            End If
+        Else
+
+            Dim rowIndex As Integer = dgvOLTC.Rows.Add()
+            With dgvOLTC.Rows(rowIndex)
+                .Cells("colTap").Value = objResponse.TapPos
+                If rowIndex <= totalTap Then
+
+                    .Cells("colUN").Value = objResponse.READING
+                ElseIf txtTotalTap.Text >= objResponse.TapPos Then
+
+                    .Cells("colvn").Value = objResponse.READING
+                ElseIf txtTotalTap.Text <= objResponse.TapPos Then
+
+                    .Cells("colwn").Value = objResponse.READING
+                End If
+            End With
+        End If
+        '''''''''''''''
+
+        'If totalTaps = 0 Then Exit Sub ' make sure initialized
+
+        'currentReadingIndex += 1
+
+        'Dim colName As String = ""
+        'Dim rowIndex As Integer = 0
+
+        '' --- Determine which column and row to fill ---
+        'If currentReadingIndex <= totalTaps Then
+        '    ' 1st pass → UN (forward)
+        '    colName = "colUN"
+        '    rowIndex = currentReadingIndex - 1
+        'ElseIf currentReadingIndex <= totalTaps * 2 Then
+        '    ' 2nd pass → VN (reverse)
+        '    colName = "colVN"
+        '    rowIndex = (totalTaps * 2) - currentReadingIndex
+        'ElseIf currentReadingIndex <= totalTaps * 3 Then
+        '    ' 3rd pass → WN (forward)
+        '    colName = "colWN"
+        '    rowIndex = currentReadingIndex - (totalTaps * 2) - 1
+        'Else
+        '    ' All readings filled
+        '    MessageBox.Show("All readings complete!")
+        '    Exit Sub
+        'End If
+
+        '' --- Fill the correct cell ---
+        'dgvOLTC.Rows(rowIndex).Cells(colName).Value = readingValue
+
+
+        ' === Ensure columns exist (only once, e.g. Form_Load) ===
+        'With dgvOLTC
+        '    .AllowUserToAddRows = False
+        '    .RowHeadersVisible = False
+        '    .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        '    If .Columns.Count = 0 Then
+        '        .Columns.Add("colTap", "Tap No")
+        '        .Columns.Add("colUN", "UN")
+        '        .Columns.Add("colvn", "VN")
+        '        .Columns.Add("colwn", "WN")
+        '    End If
+        'End With
+
+        '' === Ensure rows exist (1 to totalTaps) ===
+        'If dgvOLTC.Rows.Count < totalTaps Then
+        '    dgvOLTC.Rows.Clear()
+        '    For i As Integer = 1 To totalTaps
+        '        dgvOLTC.Rows.Add(i, Nothing, Nothing, Nothing)
+        '        dgvOLTC.Rows(i - 1).Cells("colTap").Value = i
+        '    Next
+        'End If
+
+        '' === Reading control variables ===
+        'Static currentReadingIndex As Integer = 0
+        'Static currentPass As Integer = 1 ' 1 = UN, 2 = VN, 3 = WN
+
+        'If totalTaps < 0 Then Exit Sub
+
+        '' Increment reading index each time a reading arrives
+        'currentReadingIndex += 1
+
+        '' Determine which column to fill
+        'Dim colName As String = ""
+        'Select Case currentPass
+        '    Case 1 : colName = "colUN"  ' UN pass (forward)
+        '    Case 2 : colName = "colvn"  ' VN pass (reverse)
+        '    Case 3 : colName = "colwn"  ' WN pass (forward)
+        '    Case Else
+        '        MessageBox.Show("All readings complete!")
+        '        Exit Sub
+        'End Select
+
+        '' Determine row index for current reading
+        'Dim rowIndex As Integer
+
+        'If currentPass = 1 Then
+        '    ' UN forward 1 → totalTaps
+        '    rowIndex = currentReadingIndex - 1
+        'ElseIf currentPass = 2 Then
+        '    ' VN reverse totalTaps → 1
+        '    rowIndex = totalTaps - currentReadingIndex
+        'ElseIf currentPass = 3 Then
+        '    ' WN forward 1 → totalTaps
+        '    rowIndex = currentReadingIndex - 1
+        'End If
+
+        '' Assign the reading value
+        'dgvOLTC.Rows(rowIndex).Cells(colName).Value = objResponse.READING
+
+        '' --- When current pass is complete, reset index and advance ---
+        'If currentPass = 1 AndAlso currentReadingIndex >= totalTaps Then
+        '    currentPass = 2
+        '    currentReadingIndex = 0
+        'ElseIf currentPass = 2 AndAlso currentReadingIndex >= totalTaps Then
+        '    currentPass = 3
+        '    currentReadingIndex = 0
+        'ElseIf currentPass = 3 AndAlso currentReadingIndex >= totalTaps Then
+        '    MessageBox.Show("✅ All readings complete!")
+        'End If
+
+
+
+        ''''''''''''
         Select Case objResponse.HVTestCurrentUnit
             Case objAccessXWRM10A.enmCurrentsUnit.Ampere
                 lblHVCurrent.Text = FormatCurrentReading(Val(lblHVCurrent.Text)) & " A"
@@ -1349,6 +1631,49 @@ Public Class Form1
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        'Dim rowIndex As Integer = dgvHRdata.Rows.Add()
+        'With dgvHRdata.Rows(rowIndex)
+        '    .Cells("colTap").Value = objResponse.TapNumber
+        '    .Cells("colUN").Value = objResponse.READING
+        '    'If objResponse.TapNumber > VarTapNO Then
+        '    '    Exit Sub
+        '    'End If
+        '    .Cells("colvn").Value = objResponse.READING
+        '    .Cells("colwn").Value = objResponse.READING
 
+        'End With
+        ' Assume objResponse.TapNumber and objResponse.READING are available
+
+        ' First, check if the tap number already exists in the grid
+        ' Dim existingRow As DataGridViewRow = Nothing
+
+        ' For Each row As DataGridViewRow In dgvOLTC.Rows
+        '     If Not row.IsNewRow AndAlso row.Cells("colTap").Value IsNot Nothing AndAlso
+        'CInt(row.Cells("colTap").Value) = objResponse.TapNumber Then
+        '         existingRow = row
+        '         Exit For
+        '     End If
+        ' Next
+
+        ' If existingRow IsNot Nothing Then
+        '     ' ✅ Update existing row
+        '     existingRow.Cells("colUN").Value = objResponse.READING
+        '     existingRow.Cells("colvn").Value = objResponse.READING
+        '     existingRow.Cells("colwn").Value = objResponse.READING
+        ' Else
+        '     ' ✅ Add new row for new tap number
+        '     Dim rowIndex As Integer = dgvOLTC.Rows.Add()
+        '     With dgvOLTC.Rows(rowIndex)
+        '         .Cells("colTap").Value = objResponse.TapNumber
+        '         .Cells("colUN").Value = objResponse.READING
+        '         .Cells("colvn").Value = objResponse.READING
+        '         .Cells("colwn").Value = objResponse.READING
+        '     End With
+        ' End If
+
+    End Sub
+
+    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
+        objAccessXWRM10A.Home()
     End Sub
 End Class
