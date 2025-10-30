@@ -1308,6 +1308,17 @@ Public Class clsAccessXWRM10A : Implements IDisposable
         End Try
     End Sub
 
+    Public Sub BACK()
+        Try
+            If objComPort.IsOpen = False Then Exit Sub
+            Dim strCommand As String = vbNullString
+            strCommand = "3A"
+            strCommand = strCommand & "#10"
+            strCommand = strCommand & ""
+        Catch ex As Exception
+            MsgBox("back" & Err.Description)
+        End Try
+    End Sub
     Public Sub Save()
         Try
             If objComPort.IsOpen = False Then Exit Sub
@@ -1800,7 +1811,7 @@ Public Class clsAccessXWRM10A : Implements IDisposable
                             strData = Hex(btData(24)).PadLeft(2, "0") & Hex(btData(25)).PadLeft(2, "0") & Hex(btData(26)).PadLeft(2, "0") & Hex(btData(27)).PadLeft(2, "0")
                             _ResponseResult.T1Reading = Math.Round(ConvertHexToSingle(strData), 1)
 
-
+                            ''''''''''''''''''''''''''''''''''''''''''''''''
                         Case 210 'OLTC Response
 
 
@@ -3193,6 +3204,7 @@ Public Class clsAccessXWRM10A : Implements IDisposable
         End Try
     End Sub
 
+
     Private Function ToBinary(ByVal dec As Integer) As String
         If dec = 0 Then Return "00000000"
 
@@ -3670,4 +3682,66 @@ Public Class Response
     Public READING As Double
     Public READING_UNIT As Integer
     Public TapPos As Integer
+
+    Public Function GetResistanceUnitString(unit As enmResistanceUnit) As String  '''''mohit 30-10-25
+        Select Case unit
+            Case enmResistanceUnit.uOhm
+                Return "μΩ"
+            Case enmResistanceUnit.mOhm
+                Return "mΩ"
+            Case enmResistanceUnit.Ohm
+                Return "Ω"
+            Case enmResistanceUnit.KOhm
+                Return "kΩ"
+            Case Else
+                Return ""
+        End Select
+    End Function
+
+    Public Function GetCurrentUnitString(unit As enmCurrentsUnit) As String  '''''mohit 30-10-25
+        Select Case unit
+            Case enmCurrentsUnit.mAmpere
+                Return "mA"
+            Case enmCurrentsUnit.Ampere
+                Return "A"
+            Case Else
+                Return ""
+        End Select
+    End Function
+
+    Public ReadOnly Property HVReadingWithUnit As String
+        Get
+            Return HVReading.ToString() & " " & GetResistanceUnitString(HVUnit)
+        End Get
+    End Property
+
+    Public ReadOnly Property LVReadingWithUnit As String
+        Get
+            Return LVReading.ToString() & " " & GetResistanceUnitString(LVUnit)
+        End Get
+    End Property
+
+    Public ReadOnly Property HVTestCurrentWithUnit As String
+        Get
+            Return HVTestCurrent.ToString() & " " & GetCurrentUnitString(HVTestCurrentUnit)
+        End Get
+    End Property
+
+    Public ReadOnly Property LVTestCurrentWithUnit As String
+        Get
+            Return LVTestCurrent.ToString() & " " & GetCurrentUnitString(LVTestCurrentUnit)
+        End Get
+    End Property
+
+    Public ReadOnly Property T1ReadingWithUnit As String
+        Get
+            Return T1Reading.ToString("0.0") & " °C"
+        End Get
+    End Property
+
+    Public ReadOnly Property T2ReadingWithUnit As String
+        Get
+            Return T2Reading.ToString("0.0") & " °C"
+        End Get
+    End Property
 End Class

@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Form1
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
@@ -142,7 +142,6 @@ Partial Class Form1
         Me.Label51 = New System.Windows.Forms.Label()
         Me.Button11 = New System.Windows.Forms.Button()
         Me.Button12 = New System.Windows.Forms.Button()
-        Me.Button13 = New System.Windows.Forms.Button()
         Me.TextBox4 = New System.Windows.Forms.TextBox()
         CType(Me.PictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel3.SuspendLayout()
@@ -180,7 +179,7 @@ Partial Class Form1
         Me.cmbVectorGroup.Name = "cmbVectorGroup"
         Me.cmbVectorGroup.Size = New System.Drawing.Size(160, 28)
         Me.cmbVectorGroup.TabIndex = 2
-        Me.cmbVectorGroup.Text = "DYN = 3"
+        Me.cmbVectorGroup.Text = "YNYN = 1"
         '
         'Label1
         '
@@ -213,7 +212,7 @@ Partial Class Form1
         Me.cmbHVCurrent.Name = "cmbHVCurrent"
         Me.cmbHVCurrent.Size = New System.Drawing.Size(160, 28)
         Me.cmbHVCurrent.TabIndex = 6
-        Me.cmbHVCurrent.Text = "100 mA = 3"
+        Me.cmbHVCurrent.Text = "1 A = 4"
         '
         'Label4
         '
@@ -466,7 +465,7 @@ Partial Class Form1
         Me.txtCurrentTap.Name = "txtCurrentTap"
         Me.txtCurrentTap.Size = New System.Drawing.Size(159, 26)
         Me.txtCurrentTap.TabIndex = 155
-        Me.txtCurrentTap.Text = "0"
+        Me.txtCurrentTap.Text = "1"
         '
         'Label16
         '
@@ -1387,15 +1386,6 @@ Partial Class Form1
         Me.Button12.Text = "Print"
         Me.Button12.UseVisualStyleBackColor = False
         '
-        'Button13
-        '
-        Me.Button13.Location = New System.Drawing.Point(266, 545)
-        Me.Button13.Name = "Button13"
-        Me.Button13.Size = New System.Drawing.Size(75, 23)
-        Me.Button13.TabIndex = 312
-        Me.Button13.Text = "Button13"
-        Me.Button13.UseVisualStyleBackColor = True
-        '
         'TextBox4
         '
         Me.TextBox4.Location = New System.Drawing.Point(103, 545)
@@ -1407,9 +1397,8 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1310, 586)
+        Me.ClientSize = New System.Drawing.Size(1417, 586)
         Me.Controls.Add(Me.TextBox4)
-        Me.Controls.Add(Me.Button13)
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.Panel3)
         Me.Controls.Add(Me.txtTemp2Loc)
@@ -1632,6 +1621,5 @@ Partial Class Form1
     Friend WithEvents Label51 As Label
     Friend WithEvents Button11 As Button
     Friend WithEvents Button12 As Button
-    Friend WithEvents Button13 As Button
     Friend WithEvents TextBox4 As TextBox
 End Class
